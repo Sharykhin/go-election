@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  mongodb:
+    image: mongo:4.2
+    container_name: go-election-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: election
+    ports:
+      - 27017:27017
+    volumes:
+      - .docker/mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
