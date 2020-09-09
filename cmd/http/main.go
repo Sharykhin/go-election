@@ -11,7 +11,7 @@ func main() {
 		serverPort = "3000"
 	}
 	if mongoUrl == "" {
-		mongoUrl = "mongodb://localhost:27017/"
+		mongoUrl = "mongodb://root:root@localhost:27017/"
 	}
 	http.ListenAndServe(serverPort, mongoUrl)
 }

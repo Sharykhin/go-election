@@ -13,8 +13,10 @@ import (
 
 // ListenAndServe starts a new web server of a provided addr
 func ListenAndServe(serverPort string, mongoUrl string) {
+	mongoClient := mongodb.NewClient(mongoUrl)
+
 	srv := &http.Server{
-		Handler:      router(),
+		Handler:      router(mongoClient),
 		Addr:         fmt.Sprintf(":%s", serverPort),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
@@ -23,8 +25,6 @@ func ListenAndServe(serverPort string, mongoUrl string) {
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
-
-	mongoClient := mongodb.NewClient(mongoUrl)
 
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
