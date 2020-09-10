@@ -10,30 +10,31 @@ import (
 )
 
 var (
-	candidateController *controller.CandidateController
-	campaignController  *controller.CampaignController
+	mongoClient *mongo.Client
+	dbName      = "election"
+
 	campaignRepository  *repository.CampaignRepository
 	candidateRepository *repository.CandidateRepository
-	campaignHandler     *handler.CampaignHandler
-	candidateHandler    *candidate.Handler
-	mongoClient         *mongo.Client
-	dbName              = "election"
+
+	campaignHandler  *handler.CampaignHandler
+	candidateHandler *candidate.Handler
+
+	candidateController *controller.CandidateController
+	campaignController  *controller.CampaignController
 )
 
 func init() {
 	mongoUrl := "mongodb://root:root@localhost:27017/"
-
 	mongoClient = mongodb.NewClient(mongoUrl)
+
 	campaignRepository = repository.NewCampaignRepository(mongoClient, dbName)
 	candidateRepository = repository.NewCandidateRepository(mongoClient, dbName)
+
 	campaignHandler = handler.NewCampaignHandler(campaignRepository)
 	candidateHandler = candidate.NewHandler(campaignRepository, candidateRepository)
+
 	campaignController = controller.NewCampaignController(campaignHandler)
 	candidateController = controller.NewCandidateController(candidateHandler)
-}
-
-func GetCampaignHandler() *handler.CampaignHandler {
-	return campaignHandler
 }
 
 func GetMongoClient() *mongo.Client {
@@ -42,10 +43,6 @@ func GetMongoClient() *mongo.Client {
 
 func GetCampaignController() *controller.CampaignController {
 	return campaignController
-}
-
-func GetCampaignRepository() *repository.CampaignRepository {
-	return campaignRepository
 }
 
 func GetCandidateController() *controller.CandidateController {
