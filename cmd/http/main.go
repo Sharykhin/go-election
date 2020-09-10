@@ -6,12 +6,10 @@ import (
 )
 
 func main() {
-	serverPort, mongoUrl := os.Getenv("SERVER_PORT"), os.Getenv("MONGODB_URL")
+	serverPort := os.Getenv("SERVER_PORT")
 	if serverPort == "" {
 		serverPort = "3000"
 	}
-	if mongoUrl == "" {
-		mongoUrl = "mongodb://root:root@localhost:27017/"
-	}
-	http.ListenAndServe(serverPort, mongoUrl)
+
+	http.ListenAndServe(serverPort)
 }

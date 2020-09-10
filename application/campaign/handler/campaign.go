@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	"Sharykhin/go-election/application/campaign/intrustructure"
 	"Sharykhin/go-election/domain/campaign/model"
 )
 
 type (
+	CampaignRepository interface {
+		Create(ctx context.Context, campaign model.Campaign) error
+	}
+
 	CampaignHandler struct {
-		campaignRepo intrustructure.CampaignRepository
+		campaignRepo CampaignRepository
 	}
 
 	CreateCampaignDto struct {
@@ -22,11 +25,8 @@ type (
 	}
 )
 
-func (h *CampaignHandler) Create(ctx context.Context, dto CreateCampaignDto) (*model.CampaignModel, error) {
-	campaign, err := model.NewCampaignModel(dto.Name, model.VotesPeriod{
-		StartAt: dto.StartAt,
-		EndAt:   dto.EndAt,
-	}, dto.Year)
+func (h *CampaignHandler) Create(ctx context.Context, dto CreateCampaignDto) (*model.Campaign, error) {
+	campaign, err := model.NewCampaign(dto.Name, model.NewVotesPeriod(dto.StartAt, dto.EndAt), dto.Year)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a campaign model: %v", err)
@@ -40,7 +40,7 @@ func (h *CampaignHandler) Create(ctx context.Context, dto CreateCampaignDto) (*m
 	return campaign, nil
 }
 
-func NewCampaignHandler(campaignRepo intrustructure.CampaignRepository) *CampaignHandler {
+func NewCampaignHandler(campaignRepo CampaignRepository) *CampaignHandler {
 	return &CampaignHandler{
 		campaignRepo: campaignRepo,
 	}

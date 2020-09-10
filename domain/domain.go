@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	guuid "github.com/google/uuid"
 )
 
@@ -12,8 +13,17 @@ func (id *ID) String() string {
 	return string(*id)
 }
 
-func NewID() ID {
-	id := guuid.New()
+func ParseID(id string) (ID, error) {
+	guid, err := guuid.Parse(id)
+	if err != nil {
+		return "", fmt.Errorf("id is not valid")
+	}
 
-	return ID(id.String())
+	return ID(guid.String()), nil
+}
+
+func NewID() ID {
+	guid := guuid.New()
+
+	return ID(guid.String())
 }

@@ -1,8 +1,10 @@
 package repository
 
 import (
+	"Sharykhin/go-election/domain"
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -27,7 +29,7 @@ type (
 	}
 )
 
-func (r *CampaignRepository) Create(ctx context.Context, campaign model.CampaignModel) error {
+func (r *CampaignRepository) Create(ctx context.Context, campaign model.Campaign) error {
 	collection := r.client.Database(r.dbName).Collection("campaigns")
 	_, err := collection.InsertOne(ctx, &campaignDocument{
 		ID:   campaign.ID.String(),
@@ -44,6 +46,31 @@ func (r *CampaignRepository) Create(ctx context.Context, campaign model.Campaign
 	}
 
 	return nil
+}
+
+func (r *CampaignRepository) GetCampaignByID(ctx context.Context, ID domain.ID) (*model.Campaign, error) {
+	collection := r.client.Database(r.dbName).Collection("campaigns")
+	var cd campaignDocument
+	if err := collection.FindOne(ctx, bson.M{"id": ID.String()}).Decode(&cd); err != nil {
+		return nil, fmt.Errorf("failed to get a campaing from mongodb: %v", err)
+	}
+
+	cm := r.transformDocumentToModel(&cd)
+
+	return cm, nil
+
+}
+
+func (r *CampaignRepository) transformDocumentToModel(document *campaignDocument) *model.Campaign {
+	return &model.Campaign{
+		ID: domain.ID(document.ID),
+		Name: document.Name,
+		VotesPeriod: model.VotesPeriod{
+			StartAt: document.VotesPeriod.StartAt,
+			EndAt: document.VotesPeriod.EndAt,
+		},
+		Year: document.Year,
+	}
 }
 
 func NewCampaignRepository(client *mongo.Client, dbName string) *CampaignRepository {

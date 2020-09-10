@@ -1,7 +1,7 @@
 package http
 
 import (
-	"Sharykhin/go-election/infrastructure/mongodb"
+
 	"context"
 	"fmt"
 	"log"
@@ -9,14 +9,16 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"Sharykhin/go-election/di"
 )
 
 // ListenAndServe starts a new web server of a provided addr
-func ListenAndServe(serverPort string, mongoUrl string) {
-	mongoClient := mongodb.NewClient(mongoUrl)
+func ListenAndServe(serverPort string) {
+	mongoClient := di.GetMongoClient()
 
 	srv := &http.Server{
-		Handler:      router(mongoClient),
+		Handler:      router(),
 		Addr:         fmt.Sprintf(":%s", serverPort),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
