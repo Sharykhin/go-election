@@ -8,14 +8,11 @@ import (
 	"Sharykhin/go-election/domain/candidate"
 )
 
-var (
-	collectionName = "candidates"
-)
-
 type (
 	CandidateRepository struct {
-		client *mongo.Client
-		dbName string
+		client         *mongo.Client
+		dbName         string
+		collectionName string
 	}
 
 	candidateDocument struct {
@@ -26,8 +23,18 @@ type (
 	}
 )
 
+func NewCandidateRepository(client *mongo.Client, dbName string) *CandidateRepository {
+	repository := CandidateRepository{
+		client:         client,
+		dbName:         dbName,
+		collectionName: "candidates",
+	}
+
+	return &repository
+}
+
 func (r *CandidateRepository) CreateCandidate(ctx context.Context, can *candidate.Candidate) (*candidate.Candidate, error) {
-	col := r.client.Database(r.dbName).Collection(collectionName)
+	col := r.client.Database(r.dbName).Collection(r.collectionName)
 	_, err := col.InsertOne(ctx, &candidateDocument{
 		ID:         can.ID.String(),
 		FirstName:  can.PersonalInfo.FirstName,
@@ -40,13 +47,4 @@ func (r *CandidateRepository) CreateCandidate(ctx context.Context, can *candidat
 	}
 
 	return can, nil
-}
-
-func NewCandidateRepository(client *mongo.Client, dbName string) *CandidateRepository {
-	repository := CandidateRepository{
-		client: client,
-		dbName: dbName,
-	}
-
-	return &repository
 }

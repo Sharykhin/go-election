@@ -1,4 +1,4 @@
-package model
+package campaign
 
 import (
 	"time"
@@ -14,21 +14,21 @@ type (
 	Campaign struct {
 		ID          domain.ID
 		Name        string
-		VotesPeriod VotesPeriod
+		VotesPeriod *VotesPeriod
 		Year        int
 	}
 )
 
-func NewVotesPeriod(startAt, endAt time.Time) VotesPeriod {
+func NewVotesPeriod(startAt, endAt time.Time) *VotesPeriod {
 	vp := VotesPeriod{
 		StartAt: startAt,
-		EndAt: endAt,
+		EndAt:   endAt,
 	}
 
-	return vp
+	return &vp
 }
 
-func NewCampaign(name string, votesPeriod VotesPeriod, year int) (*Campaign, error) {
+func NewCampaign(name string, votesPeriod *VotesPeriod, year int) (*Campaign, error) {
 	campaign := Campaign{
 		ID:          domain.NewID(),
 		Name:        name,

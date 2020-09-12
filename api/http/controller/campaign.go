@@ -1,18 +1,18 @@
 package controller
 
 import (
-	"Sharykhin/go-election/domain/campaign/model"
 	"context"
 	"encoding/json"
 	"net/http"
 	"time"
 
 	"Sharykhin/go-election/application/campaign/handler"
+	"Sharykhin/go-election/domain/campaign"
 )
 
 type (
 	CampaignHandler interface {
-		Create(ctx context.Context, dto handler.CreateCampaignDto) (*model.Campaign, error)
+		Create(ctx context.Context, dto handler.CreateCampaignDto) (*campaign.Campaign, error)
 	}
 
 	CampaignController struct {
@@ -37,7 +37,7 @@ func (c *CampaignController) CreateCampaign(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	campaign, err := c.campaignHandler.Create(r.Context(), handler.CreateCampaignDto{
+	cam, err := c.campaignHandler.Create(r.Context(), handler.CreateCampaignDto{
 		Name:    payload.Name,
 		StartAt: payload.StartAt,
 		EndAt:   payload.EndAt,
@@ -50,12 +50,12 @@ func (c *CampaignController) CreateCampaign(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	_, _ = w.Write([]byte(campaign.ID.String()))
+	_, _ = w.Write([]byte(cam.ID.String()))
 }
 
-func NewCampaignController(campaignHandler CampaignHandler) *CampaignController{
+func NewCampaignController(campaignHandler CampaignHandler) *CampaignController {
 	campaignController := CampaignController{
-		campaignHandler:campaignHandler,
+		campaignHandler: campaignHandler,
 	}
 
 	return &campaignController

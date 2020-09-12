@@ -1,15 +1,15 @@
 package repository
 
 import (
-	"Sharykhin/go-election/domain"
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"Sharykhin/go-election/domain/campaign/model"
+	"Sharykhin/go-election/domain"
+	"Sharykhin/go-election/domain/campaign"
 )
 
 type (
@@ -29,16 +29,16 @@ type (
 	}
 )
 
-func (r *CampaignRepository) Create(ctx context.Context, campaign model.Campaign) error {
+func (r *CampaignRepository) Create(ctx context.Context, cam *campaign.Campaign) error {
 	collection := r.client.Database(r.dbName).Collection("campaigns")
 	_, err := collection.InsertOne(ctx, &campaignDocument{
-		ID:   campaign.ID.String(),
-		Name: campaign.Name,
+		ID:   cam.ID.String(),
+		Name: cam.Name,
 		VotesPeriod: votesPeriod{
-			StartAt: campaign.VotesPeriod.StartAt,
-			EndAt:   campaign.VotesPeriod.EndAt,
+			StartAt: cam.VotesPeriod.StartAt,
+			EndAt:   cam.VotesPeriod.EndAt,
 		},
-		Year: campaign.Year,
+		Year: cam.Year,
 	})
 
 	if err != nil {
@@ -48,7 +48,7 @@ func (r *CampaignRepository) Create(ctx context.Context, campaign model.Campaign
 	return nil
 }
 
-func (r *CampaignRepository) GetCampaignByID(ctx context.Context, ID domain.ID) (*model.Campaign, error) {
+func (r *CampaignRepository) GetCampaignByID(ctx context.Context, ID domain.ID) (*campaign.Campaign, error) {
 	collection := r.client.Database(r.dbName).Collection("campaigns")
 	var cd campaignDocument
 	if err := collection.FindOne(ctx, bson.M{"id": ID.String()}).Decode(&cd); err != nil {
@@ -61,13 +61,13 @@ func (r *CampaignRepository) GetCampaignByID(ctx context.Context, ID domain.ID) 
 
 }
 
-func (r *CampaignRepository) transformDocumentToModel(document *campaignDocument) *model.Campaign {
-	return &model.Campaign{
-		ID: domain.ID(document.ID),
+func (r *CampaignRepository) transformDocumentToModel(document *campaignDocument) *campaign.Campaign {
+	return &campaign.Campaign{
+		ID:   domain.ID(document.ID),
 		Name: document.Name,
-		VotesPeriod: model.VotesPeriod{
+		VotesPeriod: &campaign.VotesPeriod{
 			StartAt: document.VotesPeriod.StartAt,
-			EndAt: document.VotesPeriod.EndAt,
+			EndAt:   document.VotesPeriod.EndAt,
 		},
 		Year: document.Year,
 	}

@@ -2,7 +2,7 @@ package candidate
 
 import (
 	"Sharykhin/go-election/domain"
-	"Sharykhin/go-election/domain/campaign/model"
+	"Sharykhin/go-election/domain/campaign"
 )
 
 type (
@@ -13,7 +13,7 @@ type (
 	Candidate struct {
 		ID           domain.ID
 		PersonalInfo *PersonalInfo
-		Campaign     *model.Campaign
+		Campaign     *campaign.Campaign
 	}
 )
 
@@ -26,7 +26,7 @@ func NewPersonalInfo(firstName, lastName string) *PersonalInfo {
 	return &pi
 }
 
-func NewCandidate(personalInfo *PersonalInfo, campaign *model.Campaign) (*Candidate, error) {
+func NewCandidate(personalInfo *PersonalInfo, campaign *campaign.Campaign) (*Candidate, error) {
 	candidate := Candidate{
 		ID:           domain.NewID(),
 		PersonalInfo: personalInfo,
