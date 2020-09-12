@@ -16,7 +16,7 @@ type (
 	}
 	Participant struct {
 		ID           domain.ID
-		PassportID   *PassportID
+		PassportID   PassportID
 		PersonalInfo *PersonalInfo
 		Campaign     *campaign.Campaign
 	}
@@ -47,7 +47,7 @@ func NewPassportID(id string) (*PassportID, error) {
 	return &passID, nil
 }
 
-func NewParticipant(passportID *PassportID, personalInfo *PersonalInfo, cam *campaign.Campaign) (*Participant, error) {
+func NewParticipant(passportID PassportID, personalInfo *PersonalInfo, cam *campaign.Campaign) (*Participant, error) {
 	participant := Participant{
 		ID:           domain.NewID(),
 		PassportID:   passportID,
@@ -58,14 +58,14 @@ func NewParticipant(passportID *PassportID, personalInfo *PersonalInfo, cam *cam
 	return &participant, nil
 }
 
-func NewVote(part *Participant, can *candidate.Candidate) (*Vote, error) {
-	if part.Campaign.ID != can.Campaign.ID {
+func NewVote(part *Participant, cand *candidate.Candidate) (*Vote, error) {
+	if part.Campaign.ID != cand.Campaign.ID {
 		return nil, errors.New("candidate belongs to a different model")
 	}
 
 	vote := Vote{
 		Participant: part,
-		Candidate:   can,
+		Candidate:   cand,
 	}
 
 	return &vote, nil

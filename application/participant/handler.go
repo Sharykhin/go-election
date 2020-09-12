@@ -1,6 +1,7 @@
 package participant
 
 import (
+	"Sharykhin/go-election/domain"
 	"context"
 	"fmt"
 
@@ -11,10 +12,28 @@ type (
 	Handler struct {
 		participantRepository ParticipantRepository
 		campaignRepository    CampaignRepository
+		candidateRepository   CandidateRepository
 	}
 )
 
-func (h *Handler) CreateParticipant(ctx context.Context, dto *CreateParticipantDto) (*participant.Participant, error) {
+func NewHandler(
+	campaignRepository CampaignRepository,
+	participantRepository ParticipantRepository,
+	candidateRepository CandidateRepository,
+) *Handler {
+	handler := Handler{
+		participantRepository: participantRepository,
+		campaignRepository:    campaignRepository,
+		candidateRepository:   candidateRepository,
+	}
+
+	return &handler
+}
+
+func (h *Handler) CreateParticipant(
+	ctx context.Context,
+	dto *CreateParticipantDto,
+) (*participant.Participant, error) {
 	cam, err := h.campaignRepository.GetCampaignByID(ctx, dto.CampaignID)
 	if err != nil {
 		return nil, fmt.Errorf("[application][participant][Handler][CreateParticipant] faild to get a campaing by id: %v", err)
@@ -28,7 +47,7 @@ func (h *Handler) CreateParticipant(ctx context.Context, dto *CreateParticipantD
 	if err != nil {
 		return nil, fmt.Errorf("[application][participant][Handler][CreateParticipant] failed to create a participant personl info value object: %v", err)
 	}
-	part, err := participant.NewParticipant(&dto.PassportID, pi, cam)
+	part, err := participant.NewParticipant(dto.PassportID, pi, cam)
 	if err != nil {
 		return nil, fmt.Errorf("[application][participant][Handler][CreateParticipant] failed to create a new participant entity: %v", err)
 	}
@@ -41,11 +60,25 @@ func (h *Handler) CreateParticipant(ctx context.Context, dto *CreateParticipantD
 	return part, nil
 }
 
-func NewHandler(campaignRepository CampaignRepository, participantRepository ParticipantRepository) *Handler {
-	handler := Handler{
-		participantRepository: participantRepository,
-		campaignRepository:    campaignRepository,
+func (h *Handler) makeVote(
+	ctx context.Context,
+	participantID,
+	candidateID domain.ID,
+) (*participant.Vote, error) {
+	part, err := h.participantRepository.GetParticipantByID(ctx, participantID)
+	if err != nil {
+		return nil, err
 	}
 
-	return &handler
+	cand, err := h.candidateRepository.GetCandidateByID(ctx, candidateID)
+	if err != nil {
+		return nil, err
+	}
+
+	vote, err := participant.NewVote(part, cand)
+	if err != nil {
+		return nil, err
+	}
+
+	return vote, nil
 }

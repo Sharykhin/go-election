@@ -1,6 +1,7 @@
 package participant
 
 import (
+	"Sharykhin/go-election/domain/candidate"
 	"context"
 
 	"Sharykhin/go-election/domain"
@@ -11,8 +12,12 @@ import (
 type (
 	ParticipantRepository interface {
 		CreateParticipant(ctx context.Context, part *participant.Participant) (*participant.Participant, error)
+		GetParticipantByID(ctx context.Context, participantID domain.ID) (*participant.Participant, error)
 	}
 	CampaignRepository interface {
 		GetCampaignByID(ctx context.Context, ID domain.ID) (*campaign.Campaign, error)
+	}
+	CandidateRepository interface {
+		GetCandidateByID(ctx context.Context, candidateID domain.ID) (*candidate.Candidate, error)
 	}
 )

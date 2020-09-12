@@ -55,21 +55,21 @@ func (r *CampaignRepository) GetCampaignByID(ctx context.Context, ID domain.ID) 
 		return nil, fmt.Errorf("failed to get a campaing from mongodb: %v", err)
 	}
 
-	cm := r.transformDocumentToModel(&cd)
+	cm := transformCampaignDocumentToModel(&cd)
 
 	return cm, nil
 
 }
 
-func (r *CampaignRepository) transformDocumentToModel(document *campaignDocument) *campaign.Campaign {
+func transformCampaignDocumentToModel(cd *campaignDocument) *campaign.Campaign {
 	return &campaign.Campaign{
-		ID:   domain.ID(document.ID),
-		Name: document.Name,
+		ID:   domain.ID(cd.ID),
+		Name: cd.Name,
 		VotesPeriod: &campaign.VotesPeriod{
-			StartAt: document.VotesPeriod.StartAt,
-			EndAt:   document.VotesPeriod.EndAt,
+			StartAt: cd.VotesPeriod.StartAt,
+			EndAt:   cd.VotesPeriod.EndAt,
 		},
-		Year: document.Year,
+		Year: cd.Year,
 	}
 }
 

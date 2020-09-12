@@ -37,7 +37,7 @@ func init() {
 
 	campaignHandler = handler.NewCampaignHandler(campaignRepository)
 	candidateHandler = candidate.NewHandler(campaignRepository, candidateRepository)
-	participantHandler = participant.NewHandler(campaignRepository, participantRepository)
+	participantHandler = participant.NewHandler(campaignRepository, participantRepository, candidateRepository)
 
 	campaignController = controller.NewCampaignController(campaignHandler)
 	candidateController = controller.NewCandidateController(candidateHandler)
