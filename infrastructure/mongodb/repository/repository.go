@@ -6,3 +6,7 @@ var (
 	participantsCollection = "participants"
 	votesCollection        = "votes"
 )
+
+const (
+	PARTICIPANT_UNIQUE_INDEX = "participantIDUniqueIndex"
+)

@@ -20,4 +20,7 @@ type (
 	CandidateRepository interface {
 		GetCandidateByID(ctx context.Context, candidateID domain.ID) (*candidate.Candidate, error)
 	}
+	VoteRepository interface {
+		CreateVote(ctx context.Context, vote *participant.Vote) (*participant.Vote, error)
+	}
 )

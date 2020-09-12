@@ -22,6 +22,8 @@ func router() http.Handler {
 
 	r.HandleFunc("/campaigns", campaignController.CreateCampaign).Methods("POST")
 	r.HandleFunc("/candidates", candidateController.CreateCandidate).Methods("POST")
+	r.HandleFunc("/participants", di.ParticipantController.CreateParticipant).Methods("POST")
+	r.HandleFunc("/participants/{participantID}/votes", di.ParticipantController.MakeVote).Methods("POST")
 
 	return r
 }

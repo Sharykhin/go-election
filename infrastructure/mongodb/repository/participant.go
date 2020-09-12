@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"strings"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -46,7 +47,10 @@ func (r *ParticipantRepository) CreateParticipant(ctx context.Context, part *par
 	})
 
 	if err != nil {
-		return nil, err
+		if strings.Contains(err.Error(), PARTICIPANT_UNIQUE_INDEX) {
+			fmt.Println("HA HA HA")
+		}
+		return nil, fmt.Errorf("[infrastructure][mongodb][ParticipantRepository][CreateParticipant] failed to save a new participant in mongodb: %v", err)
 	}
 
 	return part, nil
@@ -63,11 +67,11 @@ func (r *ParticipantRepository) GetParticipantByID(
 	var cam campaignDocument
 
 	if err := col.FindOne(ctx, bson.M{"id": participantID.String()}).Decode(&pd); err != nil {
-		return nil, fmt.Errorf("failed to find participant document in mongo: %v", err)
+		return nil, fmt.Errorf("[infrastructure][mongodb][ParticipantRepository][GetParticipantByID] failed to find participant document in mongo: %v", err)
 	}
 
 	if err := camColl.FindOne(ctx, bson.M{"id": pd.CampaignID}).Decode(&cam); err != nil {
-		return nil, fmt.Errorf("failed to find a campaing document in mongo: %v", err)
+		return nil, fmt.Errorf("[infrastructure][mongodb][ParticipantRepository][GetParticipantByID] failed to find a campaing document in mongo: %v", err)
 	}
 
 	p := transformParticipantDocumentToModel(&pd, &cam)

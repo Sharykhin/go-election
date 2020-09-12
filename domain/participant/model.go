@@ -21,6 +21,7 @@ type (
 		Campaign     *campaign.Campaign
 	}
 	Vote struct {
+		ID          domain.ID
 		Participant *Participant
 		Candidate   *candidate.Candidate
 	}
@@ -39,12 +40,12 @@ func NewPersonalInfo(firstName, lastName string) (*PersonalInfo, error) {
 	return &pi, nil
 }
 
-func NewPassportID(id string) (*PassportID, error) {
-	if len(id) != 12 {
-		return nil, errors.New("id must be equal 12 characters")
+func NewPassportID(id string) (PassportID, error) {
+	if len(id) != 4 {
+		return "", errors.New("passport id must be equal 4 characters")
 	}
-	passID := PassportID(id)
-	return &passID, nil
+
+	return PassportID(id), nil
 }
 
 func NewParticipant(passportID PassportID, personalInfo *PersonalInfo, cam *campaign.Campaign) (*Participant, error) {
@@ -64,6 +65,7 @@ func NewVote(part *Participant, cand *candidate.Candidate) (*Vote, error) {
 	}
 
 	vote := Vote{
+		ID:          domain.NewID(),
 		Participant: part,
 		Candidate:   cand,
 	}

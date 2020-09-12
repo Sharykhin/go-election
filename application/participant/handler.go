@@ -13,6 +13,7 @@ type (
 		participantRepository ParticipantRepository
 		campaignRepository    CampaignRepository
 		candidateRepository   CandidateRepository
+		voteRepository        VoteRepository
 	}
 )
 
@@ -20,11 +21,13 @@ func NewHandler(
 	campaignRepository CampaignRepository,
 	participantRepository ParticipantRepository,
 	candidateRepository CandidateRepository,
+	voteRepository VoteRepository,
 ) *Handler {
 	handler := Handler{
 		participantRepository: participantRepository,
 		campaignRepository:    campaignRepository,
 		candidateRepository:   candidateRepository,
+		voteRepository:        voteRepository,
 	}
 
 	return &handler
@@ -60,7 +63,7 @@ func (h *Handler) CreateParticipant(
 	return part, nil
 }
 
-func (h *Handler) makeVote(
+func (h *Handler) MakeVote(
 	ctx context.Context,
 	participantID,
 	candidateID domain.ID,
@@ -76,6 +79,11 @@ func (h *Handler) makeVote(
 	}
 
 	vote, err := participant.NewVote(part, cand)
+	if err != nil {
+		return nil, err
+	}
+
+	vote, err = h.voteRepository.CreateVote(ctx, vote)
 	if err != nil {
 		return nil, err
 	}

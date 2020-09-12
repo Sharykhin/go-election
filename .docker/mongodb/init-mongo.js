@@ -1,3 +1,4 @@
 db.createCollection('campaigns');
 db.createCollection('votes');
-db.votes.createIndex({campaignID: 1, participantID: 1}, {unique: true, name: "campaignIDParticipantIDUniqueIndex"});
+db.votes.createIndex({campaign_id: 1, participant_id: 1}, {unique: true, name: "campaignIDParticipantIDUniqueIndex"});
+db.participants.createIndex({passport_id: 1}, {unique: true, name: "participantIDUniqueIndex"});
