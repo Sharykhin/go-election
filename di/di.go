@@ -2,6 +2,7 @@ package di
 
 import (
 	"go.mongodb.org/mongo-driver/mongo"
+	"os"
 
 	"Sharykhin/go-election/api/http/controller"
 	"Sharykhin/go-election/application/campaign/handler"
@@ -24,14 +25,18 @@ var (
 	candidateHandler   *candidate.Handler
 	participantHandler *participant.Handler
 
-	candidateController   *controller.CandidateController
-	campaignController    *controller.CampaignController
+	CandidateController   *controller.CandidateController
+	CampaignController    *controller.CampaignController
 	ParticipantController *controller.ParticipantController
 )
 
 func init() {
-	mongoUrl := "mongodb://root:root@localhost:27017/"
-	mongoClient = mongodb.NewClient(mongoUrl)
+	mongoURL := os.Getenv("MONGO_URL")
+	if mongoURL == "" {
+		mongoURL = "mongodb://root:root@localhost:27017/"
+	}
+
+	mongoClient = mongodb.NewClient(mongoURL)
 
 	campaignRepository = repository.NewCampaignRepository(mongoClient, dbName)
 	candidateRepository = repository.NewCandidateRepository(mongoClient, dbName)
@@ -42,19 +47,11 @@ func init() {
 	candidateHandler = candidate.NewHandler(campaignRepository, candidateRepository)
 	participantHandler = participant.NewHandler(campaignRepository, participantRepository, candidateRepository, voteRepository)
 
-	campaignController = controller.NewCampaignController(campaignHandler)
-	candidateController = controller.NewCandidateController(candidateHandler)
+	CampaignController = controller.NewCampaignController(campaignHandler)
+	CandidateController = controller.NewCandidateController(candidateHandler)
 	ParticipantController = controller.NewParticipantController(participantHandler)
 }
 
 func GetMongoClient() *mongo.Client {
 	return mongoClient
-}
-
-func GetCampaignController() *controller.CampaignController {
-	return campaignController
-}
-
-func GetCandidateController() *controller.CandidateController {
-	return candidateController
 }

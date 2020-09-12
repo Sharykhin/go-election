@@ -14,8 +14,7 @@ import (
 
 type (
 	CampaignRepository struct {
-		client *mongo.Client
-		dbName string
+		db *mongo.Database
 	}
 	votesPeriod struct {
 		StartAt time.Time `bson:"start_at"`
@@ -29,9 +28,15 @@ type (
 	}
 )
 
+func NewCampaignRepository(client *mongo.Client, dbName string) *CampaignRepository {
+	return &CampaignRepository{
+		db: client.Database(dbName),
+	}
+}
+
 func (r *CampaignRepository) Create(ctx context.Context, cam *campaign.Campaign) error {
-	collection := r.client.Database(r.dbName).Collection("campaigns")
-	_, err := collection.InsertOne(ctx, &campaignDocument{
+	coll := r.db.Collection(campaignsCollection)
+	_, err := coll.InsertOne(ctx, &campaignDocument{
 		ID:   cam.ID.String(),
 		Name: cam.Name,
 		VotesPeriod: votesPeriod{
@@ -48,34 +53,27 @@ func (r *CampaignRepository) Create(ctx context.Context, cam *campaign.Campaign)
 	return nil
 }
 
-func (r *CampaignRepository) GetCampaignByID(ctx context.Context, ID domain.ID) (*campaign.Campaign, error) {
-	collection := r.client.Database(r.dbName).Collection("campaigns")
-	var cd campaignDocument
-	if err := collection.FindOne(ctx, bson.M{"id": ID.String()}).Decode(&cd); err != nil {
+func (r *CampaignRepository) GetCampaignByID(ctx context.Context, campaignID domain.ID) (*campaign.Campaign, error) {
+	coll := r.db.Collection(campaignsCollection)
+	var campd campaignDocument
+	if err := coll.FindOne(ctx, bson.M{"id": campaignID.String()}).Decode(&campd); err != nil {
 		return nil, fmt.Errorf("failed to get a campaing from mongodb: %v", err)
 	}
 
-	cm := transformCampaignDocumentToModel(&cd)
+	cm := transformCampaignDocumentToModel(&campd)
 
 	return cm, nil
 
 }
 
-func transformCampaignDocumentToModel(cd *campaignDocument) *campaign.Campaign {
+func transformCampaignDocumentToModel(campd *campaignDocument) *campaign.Campaign {
 	return &campaign.Campaign{
-		ID:   domain.ID(cd.ID),
-		Name: cd.Name,
+		ID:   domain.ID(campd.ID),
+		Name: campd.Name,
 		VotesPeriod: &campaign.VotesPeriod{
-			StartAt: cd.VotesPeriod.StartAt,
-			EndAt:   cd.VotesPeriod.EndAt,
+			StartAt: campd.VotesPeriod.StartAt,
+			EndAt:   campd.VotesPeriod.EndAt,
 		},
-		Year: cd.Year,
-	}
-}
-
-func NewCampaignRepository(client *mongo.Client, dbName string) *CampaignRepository {
-	return &CampaignRepository{
-		client: client,
-		dbName: dbName,
+		Year: campd.Year,
 	}
 }

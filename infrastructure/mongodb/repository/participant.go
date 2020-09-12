@@ -1,14 +1,14 @@
 package repository
 
 import (
-	"Sharykhin/go-election/domain"
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
 	"strings"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
+	"Sharykhin/go-election/domain"
 	"Sharykhin/go-election/domain/participant"
 )
 

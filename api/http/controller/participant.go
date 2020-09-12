@@ -71,33 +71,27 @@ func (c *ParticipantController) CreateParticipant(w http.ResponseWriter, r *http
 	if err != nil {
 		var mr *util.MalformedRequest
 		if errors.As(err, &mr) {
-			http.Error(w, mr.Msg, mr.Status)
+			util.Error(w, mr.Msg, mr.Status)
 		} else {
 			log.Println(err.Error())
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			util.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
 		return
 	}
 
 	dto, err := p.createDto()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(err.Error()))
+		util.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	part, err := c.participantHandler.CreateParticipant(r.Context(), dto)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(err.Error()))
+		util.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	_, err = w.Write([]byte(part.ID.String()))
-	if err != nil {
-		log.Printf("failed to write a resonse: %v", err)
-	}
+	util.Response(w, part.ID.String(), http.StatusCreated)
 }
 
 func (c *ParticipantController) MakeVote(w http.ResponseWriter, r *http.Request) {

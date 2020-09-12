@@ -1,15 +1,11 @@
 package http
 
 import (
-	"Sharykhin/go-election/di"
 	"net/http"
 
 	"github.com/gorilla/mux"
-)
 
-var (
-	campaignController  = di.GetCampaignController()
-	candidateController = di.GetCandidateController()
+	"Sharykhin/go-election/di"
 )
 
 func router() http.Handler {
@@ -20,8 +16,8 @@ func router() http.Handler {
 		_, _ = w.Write([]byte("OK"))
 	}).Methods("GET")
 
-	r.HandleFunc("/campaigns", campaignController.CreateCampaign).Methods("POST")
-	r.HandleFunc("/candidates", candidateController.CreateCandidate).Methods("POST")
+	r.HandleFunc("/campaigns", di.CampaignController.CreateCampaign).Methods("POST")
+	r.HandleFunc("/candidates", di.CandidateController.CreateCandidate).Methods("POST")
 	r.HandleFunc("/participants", di.ParticipantController.CreateParticipant).Methods("POST")
 	r.HandleFunc("/participants/{participantID}/votes", di.ParticipantController.MakeVote).Methods("POST")
 

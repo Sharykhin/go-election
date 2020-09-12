@@ -1,14 +1,15 @@
 package participant
 
 import (
-	"Sharykhin/go-election/domain"
 	"context"
 	"fmt"
 
+	"Sharykhin/go-election/domain"
 	"Sharykhin/go-election/domain/participant"
 )
 
 type (
+	// Handler is a struct that handles all uses cases around participant domain
 	Handler struct {
 		participantRepository ParticipantRepository
 		campaignRepository    CampaignRepository
@@ -17,6 +18,7 @@ type (
 	}
 )
 
+// NewHandler returns a new instance of handler with all repositories injected
 func NewHandler(
 	campaignRepository CampaignRepository,
 	participantRepository ParticipantRepository,
@@ -33,17 +35,14 @@ func NewHandler(
 	return &handler
 }
 
+// CreateParticipant implements use case of creating a new participant
 func (h *Handler) CreateParticipant(
 	ctx context.Context,
 	dto *CreateParticipantDto,
 ) (*participant.Participant, error) {
 	cam, err := h.campaignRepository.GetCampaignByID(ctx, dto.CampaignID)
 	if err != nil {
-		return nil, fmt.Errorf("[application][participant][Handler][CreateParticipant] faild to get a campaing by id: %v", err)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("[application][participant][Handler][CreateParticipant] failed to create a new candidate: %v", err)
+		return nil, fmt.Errorf("[application][participant][Handler][CreateParticipant] failed to get a campaing by id: %v", err)
 	}
 
 	pi, err := participant.NewPersonalInfo(dto.FirstName, dto.LastName)

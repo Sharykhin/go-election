@@ -6,6 +6,7 @@ import (
 )
 
 type (
+	// CreateParticipantDto describes data transfer object in order to create a new participant by a handler
 	CreateParticipantDto struct {
 		FirstName  string
 		LastName   string
