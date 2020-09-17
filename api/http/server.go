@@ -1,7 +1,6 @@
 package http
 
 import (
-
 	"context"
 	"fmt"
 	"log"
@@ -13,10 +12,8 @@ import (
 	"Sharykhin/go-election/di"
 )
 
-// ListenAndServe starts a new web server of a provided addr
+// ListenAndServe starts a new web server on a provided port
 func ListenAndServe(serverPort string) {
-	mongoClient := di.GetMongoClient()
-
 	srv := &http.Server{
 		Handler:      router(),
 		Addr:         fmt.Sprintf(":%s", serverPort),
@@ -31,7 +28,7 @@ func ListenAndServe(serverPort string) {
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-		err := mongoClient.Connect(ctx)
+		err := di.MongoClient.Connect(ctx)
 		if err != nil {
 			log.Fatalf("failed to connect to mongodb: %v", err)
 		}
@@ -52,7 +49,7 @@ func ListenAndServe(serverPort string) {
 		log.Fatalf("Failed to gracefully shutdwon the server; %v", err)
 	}
 
-	err = mongoClient.Disconnect(ctx)
+	err = di.MongoClient.Disconnect(ctx)
 	if err != nil {
 		log.Fatalf("Failed to disconnect from mongodb: %v", err)
 	}

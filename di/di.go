@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	mongoClient *mongo.Client
+	MongoClient *mongo.Client
 	dbName      = "election"
 
 	campaignRepository    *repository.CampaignRepository
@@ -36,12 +36,12 @@ func init() {
 		mongoURL = "mongodb://root:root@localhost:27017/"
 	}
 
-	mongoClient = mongodb.NewClient(mongoURL)
+	MongoClient = mongodb.NewClient(mongoURL)
 
-	campaignRepository = repository.NewCampaignRepository(mongoClient, dbName)
-	candidateRepository = repository.NewCandidateRepository(mongoClient, dbName)
-	participantRepository = repository.NewParticipantRepository(mongoClient, dbName)
-	voteRepository = repository.NewVoteRepository(mongoClient, dbName)
+	campaignRepository = repository.NewCampaignRepository(MongoClient, dbName)
+	candidateRepository = repository.NewCandidateRepository(MongoClient, dbName)
+	participantRepository = repository.NewParticipantRepository(MongoClient, dbName)
+	voteRepository = repository.NewVoteRepository(MongoClient, dbName)
 
 	campaignHandler = handler.NewCampaignHandler(campaignRepository)
 	candidateHandler = candidate.NewHandler(campaignRepository, candidateRepository)
@@ -50,8 +50,4 @@ func init() {
 	CampaignController = controller.NewCampaignController(campaignHandler)
 	CandidateController = controller.NewCandidateController(candidateHandler)
 	ParticipantController = controller.NewParticipantController(participantHandler)
-}
-
-func GetMongoClient() *mongo.Client {
-	return mongoClient
 }
